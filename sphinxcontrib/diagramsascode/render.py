@@ -28,7 +28,7 @@ def render_diagram(self, code, options, format=None, prefix='diagram'):
                 if filename.endswith('.png') or filename.endswith('.svg'):
                     break
             else:
-                raise DiagramError('No generated image was found')
+                raise DiagramError(__('Diagrams did not generate a PNG or SVG file'))
 
             fname = '%s-%s%s' % (prefix, sha1(hashkey).hexdigest(), path.splitext(filename)[1])
             relfn = posixpath.join(self.builder.imgpath, fname)

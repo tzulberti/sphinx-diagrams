@@ -1,10 +1,12 @@
 """
-    sphinxcontrib.sphinx-diagrams
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    sphinxcontrib.diagramsascode
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Sphinx extension for the Diagrams package
+    Sphinx extension for the `Diagrams
+    <https://github.com/mingrammer/diagrams>`__
+    package
 
-    :copyright: Copyright 2017 by Tomas Zulberti <tzulberti@gmail.com>
+    :copyright: Copyright 20202 by Tomas Zulberti <tzulberti@gmail.com>
     :license: BSD, see LICENSE for details.
 """
 
@@ -18,7 +20,7 @@ from sphinx.util.i18n import search_image_for_language
 
 from .render import html_visit_diagramascode
 
-__version__ = pbr.version.VersionInfo('sphinx-diagrams').version_string()
+__version__ = pbr.version.VersionInfo('sphinxcontrib-diagramsascode').version_string()
 
 
 class DiagramNode(nodes.General, nodes.Inline, nodes.Element):
@@ -27,7 +29,7 @@ class DiagramNode(nodes.General, nodes.Inline, nodes.Element):
 
 class DiagramAsCode(SphinxDirective):
     """
-    Directive to insert arbitrary dot markup.
+    Directive to insert arbitrary Diagrams markup.
     """
     has_content = True
     required_arguments = 0
@@ -37,7 +39,6 @@ class DiagramAsCode(SphinxDirective):
         'alt': directives.unchanged,
         'caption': directives.unchanged,
         'layout': directives.unchanged,
-        'graphviz_dot': directives.unchanged,  # an old alias of `layout` option
         'name': directives.unchanged,
     }
 
@@ -46,8 +47,8 @@ class DiagramAsCode(SphinxDirective):
             document = self.state.document
             if self.content:
                 return [document.reporter.warning(
-                    __('Graphviz directive cannot have both content and '
-                       'a filename argument'), line=self.lineno)]
+                        __('DiagramsAsCode directive cannot have both content and '
+                           'a filename argument'), line=self.lineno)]
             argument = search_image_for_language(self.arguments[0], self.env)
             rel_filename, filename = self.env.relfn2path(argument)
             self.env.note_dependency(rel_filename)
@@ -56,8 +57,8 @@ class DiagramAsCode(SphinxDirective):
                     dotcode = fp.read()
             except OSError:
                 return [document.reporter.warning(
-                    __('External Graphviz file %r not found or reading '
-                       'it failed') % filename, line=self.lineno)]
+                        __('External DiagramsAsCode file %r not found or reading '
+                           'it failed') % filename, line=self.lineno)]
         else:
             dotcode = '\n'.join(self.content)
             if not dotcode.strip():
@@ -68,8 +69,6 @@ class DiagramAsCode(SphinxDirective):
         node['code'] = dotcode
         node['options'] = {'docname': self.env.docname}
 
-        if 'graphviz_dot' in self.options:
-            node['options']['layout'] = self.options['graphviz_dot']
         if 'layout' in self.options:
             node['options']['layout'] = self.options['layout']
         if 'alt' in self.options:
@@ -86,5 +85,4 @@ def setup(app):
                  html=(html_visit_diagramascode, None),)
     app.add_directive('diagramascode', DiagramAsCode)
 
-    app.add_config_value('diagramascode', 'python_interpreter', 'python')
     return {'version': __version__, 'parallel_read_safe': True}
